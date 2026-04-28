@@ -1,0 +1,185 @@
+<?php
+// app/Http/Controllers/LockerCodeController.php
+
+namespace App\Http\Controllers;
+
+use App\Models\LockerCode;
+use App\Services\LockerCodeService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
+class LockerCodeController extends Controller
+{
+    public function __construct(protected LockerCodeService $service) {}
+
+    public function index(Request $request): InertiaResponse
+    {
+        $filters = $request->only(['search', 'remarks', 'sort_by', 'sort_dir']);
+
+        return Inertia::render('Lockers/Index', [
+            'lockers'       => $this->service->list($filters),
+            'filters'       => $filters,
+            'remarkOptions' => collect(LockerCode::REMARK_LABELS)
+                ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
+                ->values(),
+        ]);
+    }
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'locker_no' => ['required', 'string', 'max:100'],
+            'employ_id' => ['nullable', 'string', 'max:50'],
+            'passcode'  => ['nullable', 'string', 'max:50'],
+            'remarks'   => ['required', Rule::in(LockerCode::REMARKS)],
+        ]);
+
+        $data['remarks'] = (int) $data['remarks'];
+
+        $this->service->create($data);
+
+        return back()->with('success', 'Locker created successfully.');
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $data = $request->validate([
+            'locker_no' => ['sometimes', 'string', 'max:100'],
+            'employ_id' => ['nullable', 'string', 'max:50'],
+            'passcode'  => ['nullable', 'string', 'max:50'],
+            'remarks'   => ['sometimes', Rule::in(LockerCode::REMARKS)],
+        ]);
+
+        if (isset($data['remarks'])) {
+            $data['remarks'] = (int) $data['remarks'];
+        }
+
+        $this->service->edit($id, $data);
+
+        return back()->with('success', 'Locker updated successfully.');
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $this->service->delete($id);
+
+        return back()->with('success', 'Locker deleted.');
+    }
+
+    public function transfer(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'from_id'      => ['required', 'integer', 'exists:locker_codes,id'],
+            'to_locker_no' => ['required', 'string', 'exists:locker_codes,locker_no'],
+        ]);
+
+        $result = $this->service->transfer($data['from_id'], $data['to_locker_no']);
+
+        return back()->with('success', "Transferred from locker {$result['from']->locker_no} to {$result['to']->locker_no}.");
+    }
+
+    public function upload(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:10240'],
+        ]);
+
+        $rows   = $this->parseExcel($request->file('file'));
+        $result = $this->service->upload($rows);
+
+        return back()->with('upload_result', [
+            'success_count' => $result['created']->count(),
+            'errors'        => $result['errors'],
+        ]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $records     = $this->service->export($request->only(['remarks']));
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray(
+            ['Locker Number', 'Emp No', 'Passcode', 'Status', 'Remarks'],
+            null, 'A1'
+        );
+
+        $row = 2;
+        foreach ($records as $r) {
+            $sheet->fromArray([
+                $r->locker_no,
+                $r->employ_id ?? '',
+                $r->passcode  ?? '',
+                LockerCode::REMARK_LABELS[$r->remarks] ?? '',
+                $r->notes     ?? '',
+            ], null, "A{$row}");
+            $row++;
+        }
+
+        $writer   = new Xlsx($spreadsheet);
+        $filename = 'lockers_' . now()->format('Ymd_His') . '.xlsx';
+
+        return response()->streamDownload(
+            fn() => $writer->save('php://output'),
+            $filename,
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        );
+    }
+
+    public function available(Request $request): JsonResponse
+    {
+        $search  = $request->input('search') ?? '';
+        $lockers = $this->service->availableLockers($search);
+
+        $options = $lockers->map(fn($l) => [
+            'value' => $l->locker_no,
+            'label' => $l->locker_no . ' (' . LockerCode::REMARK_LABELS[$l->remarks] . ')',
+        ]);
+
+        return response()->json([
+            'options' => $options,
+            'hasMore' => false,
+        ]);
+    }
+
+    private function parseExcel(\Illuminate\Http\UploadedFile $file): array
+    {
+        $spreadsheet = IOFactory::load($file->getRealPath());
+        $sheet       = $spreadsheet->getActiveSheet();
+        $rows        = [];
+        $headers     = null;
+
+        foreach ($sheet->getRowIterator() as $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $cells = [];
+            foreach ($cellIterator as $cell) {
+                $cells[] = trim((string) ($cell->getValue() ?? ''));
+            }
+
+            if (!$headers) {
+                // Normalise: lowercase + spaces → underscores
+                $headers = array_map(
+                    fn($h) => str_replace(' ', '_', strtolower(trim($h))),
+                    $cells
+                );
+                continue;
+            }
+
+            // Skip fully-empty rows
+            if (empty(array_filter($cells, fn($v) => $v !== ''))) continue;
+
+            $rows[] = array_combine($headers, array_pad($cells, count($headers), ''));
+        }
+
+        return $rows;
+    }
+}
