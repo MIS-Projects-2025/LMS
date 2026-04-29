@@ -1,5 +1,6 @@
 import { usePage } from "@inertiajs/react";
 import SidebarLink from "@/Components/sidebar/SidebarLink";
+import Dropdown from "@/Components/sidebar/DropDown";
 import { LayoutDashboard, LockIcon, User } from "lucide-react";
 
 export default function NavLinks({ isSidebarOpen }) {
@@ -16,11 +17,14 @@ export default function NavLinks({ isSidebarOpen }) {
                 icon={<User className="w-5 h-5" />}
                 isSidebarOpen={isSidebarOpen}
             />
-            <SidebarLink
-                href={route("lockers.index")}
+            <Dropdown
                 label="Lockers"
-                icon={<LockIcon className="w-5 h-5" />}
+                icon={<LockIcon className="w-[18px] h-[18px]" />}
                 isSidebarOpen={isSidebarOpen}
+                links={[
+                    { href: route("lockers.index"),       label: "All Lockers" },
+                    { href: route("admin-lockers.index"), label: "Admin Lockers" },
+                ]}
             />
         </nav>
     );
