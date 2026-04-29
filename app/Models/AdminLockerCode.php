@@ -6,10 +6,10 @@ use App\Traits\Loggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-class LockerCode extends Model
+class AdminLockerCode extends Model
 {
     use Loggable;
-    protected $table = 'locker_codes';
+    protected $table = 'admin_locker_codes';
 
     protected $fillable = [
         'locker_no',

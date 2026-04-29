@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LockerCode;
-use App\Services\LockerCodeService;
+use App\Models\AdminLockerCode;
+use App\Services\AdminLockerCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,9 +14,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class LockerCodeController extends Controller
+class AdminLockerCodeController extends Controller
 {
-    public function __construct(protected LockerCodeService $service) {}
+    public function __construct(protected AdminLockerCodeService $service) {}
 
     public function index(Request $request): InertiaResponse
     {
@@ -25,10 +25,10 @@ class LockerCodeController extends Controller
 
         $lockers = $this->service->list($filters, $perPage);
 
-        return Inertia::render('Lockers/Index', [
+        return Inertia::render('Lockers/AdminIndex', [
             'lockers'       => $lockers,
             'filters'       => array_merge($filters, ['per_page' => $perPage]),
-            'remarkOptions' => collect(LockerCode::REMARK_LABELS)
+            'remarkOptions' => collect(AdminLockerCode::REMARK_LABELS)
                 ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
                 ->values(),
             'upload_result' => session('upload_result'),
@@ -45,7 +45,7 @@ class LockerCodeController extends Controller
 
         $this->service->create($data);
 
-        return back()->with('success', 'Locker created successfully.');
+        return back()->with('success', 'Admin locker created successfully.');
     }
 
     public function update(Request $request, int $id): RedirectResponse
@@ -58,21 +58,21 @@ class LockerCodeController extends Controller
 
         $this->service->edit($id, $data);
 
-        return back()->with('success', 'Locker updated successfully.');
+        return back()->with('success', 'Admin locker updated successfully.');
     }
 
     public function destroy(int $id): RedirectResponse
     {
         $this->service->delete($id);
 
-        return back()->with('success', 'Locker deleted.');
+        return back()->with('success', 'Admin locker deleted.');
     }
 
     public function transfer(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'from_id'      => ['required', 'integer', 'exists:locker_codes,id'],
-            'to_locker_no' => ['required', 'string', 'exists:locker_codes,locker_no'],
+            'from_id'      => ['required', 'integer', 'exists:admin_locker_codes,id'],
+            'to_locker_no' => ['required', 'string', 'exists:admin_locker_codes,locker_no'],
         ]);
 
         $result = $this->service->transfer($data['from_id'], $data['to_locker_no']);
@@ -89,7 +89,7 @@ class LockerCodeController extends Controller
         $rows   = $this->parseExcel($request->file('file'));
         $result = $this->service->upload($rows);
 
-        return redirect()->route('lockers.index')->with('upload_result', [
+        return redirect()->route('admin-lockers.index')->with('upload_result', [
             'success_count' => $result['counts']['created'] + $result['counts']['updated'],
             'created_count' => $result['counts']['created'],
             'updated_count' => $result['counts']['updated'],
@@ -115,7 +115,7 @@ class LockerCodeController extends Controller
                 $r->locker_no,
                 $r->employ_id ?? '',
                 $r->passcode  ?? '',
-                LockerCode::REMARK_LABELS[$r->remarks] ?? '',
+                AdminLockerCode::REMARK_LABELS[$r->remarks] ?? '',
                 $r->notes     ?? '',
             ], null, "A{$row}");
             $row++;
@@ -124,7 +124,7 @@ class LockerCodeController extends Controller
         $writer   = new Xlsx($spreadsheet);
         $suffix = '';
         if (!empty($filters['remarks'])) {
-            $label  = LockerCode::REMARK_LABELS[$filters['remarks']] ?? 'filtered';
+            $label  = AdminLockerCode::REMARK_LABELS[$filters['remarks']] ?? 'filtered';
             $suffix = '_' . strtolower($label);
         }
 
@@ -144,11 +144,11 @@ class LockerCodeController extends Controller
 
         $sheet->fromArray(['Locker Number', 'Emp No', 'Passcode'], null, 'A1');
 
-        $writer   = new Xlsx($spreadsheet);
+        $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(
             fn() => $writer->save('php://output'),
-            'lockers_template.xlsx',
+            'admin_lockers_template.xlsx',
             ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
         );
     }
@@ -160,7 +160,7 @@ class LockerCodeController extends Controller
 
         $options = $lockers->map(fn($l) => [
             'value' => $l->locker_no,
-            'label' => $l->locker_no . ' (' . LockerCode::REMARK_LABELS[$l->remarks] . ')',
+            'label' => $l->locker_no . ' (' . AdminLockerCode::REMARK_LABELS[$l->remarks] . ')',
         ]);
 
         return response()->json([

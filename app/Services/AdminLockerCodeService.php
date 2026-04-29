@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\LockerCode;
+use App\Models\AdminLockerCode;
 use App\Models\LockerLogs;
+use App\Repositories\AdminLockerCodeRepository;
 use App\Repositories\EmployeeRepository;
-use App\Repositories\LockerCodeRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
-class LockerCodeService
+class AdminLockerCodeService
 {
     public function __construct(
-        protected LockerCodeRepository $repo,
-        protected EmployeeRepository   $employees,
+        protected AdminLockerCodeRepository $repo,
+        protected EmployeeRepository        $employees,
     ) {}
 
     public function list(array $filters, int $perPage = 15): LengthAwarePaginator
@@ -32,7 +32,7 @@ class LockerCodeService
         return $paginator;
     }
 
-    public function create(array $data): LockerCode
+    public function create(array $data): AdminLockerCode
     {
         $this->ensureLockerNotTaken($data['locker_no']);
         $this->ensureEmployeeNotAssigned($data['employ_id'] ?? null);
@@ -43,7 +43,7 @@ class LockerCodeService
         return $this->repo->create($data);
     }
 
-    public function edit(int $id, array $data): LockerCode
+    public function edit(int $id, array $data): AdminLockerCode
     {
         $record = $this->repo->findById($id);
 
@@ -59,7 +59,6 @@ class LockerCodeService
             $this->ensureEmployeeNotAssigned($data['employ_id'], $id);
         }
 
-        // Auto-compute remarks from the resulting employ_id
         $employId        = array_key_exists('employ_id', $data) ? $data['employ_id'] : $record->employ_id;
         $data['remarks'] = $this->computeRemarks($employId);
 
@@ -93,7 +92,7 @@ class LockerCodeService
         $this->repo->update($from->id, [
             'employ_id' => null,
             'passcode'  => null,
-            'remarks'   => LockerCode::REMARK_VACANT,
+            'remarks'   => AdminLockerCode::REMARK_VACANT,
         ]);
 
         return ['from' => $from->fresh(), 'to' => $updated];
@@ -104,10 +103,6 @@ class LockerCodeService
         return $this->repo->delete($id);
     }
 
-    /**
-     * Bulk upload rows from an Excel file.
-     * Returns ['counts' => [...], 'errors' => [...]]
-     */
     public function upload(array $rows): array
     {
         $errors = [];
@@ -135,7 +130,6 @@ class LockerCodeService
                 continue;
             }
 
-            // Duplicate employee within the uploaded file
             if ($employId && in_array($employId, $seen)) {
                 $errors[] = "Row {$rowNum}: Employee No {$employId} is duplicated in the file.";
                 continue;
@@ -196,7 +190,7 @@ class LockerCodeService
             return ['data' => [], 'has_more' => false, 'total' => 0];
         }
 
-        $paginator = LockerLogs::where('loggable_type', LockerCode::class)
+        $paginator = LockerLogs::where('loggable_type', AdminLockerCode::class)
             ->where('loggable_id', $record->id)
             ->orderByDesc('action_at')
             ->paginate($perPage, ['*'], 'page', $page);
@@ -211,31 +205,23 @@ class LockerCodeService
     // ── private helpers ───────────────────────────────────────────────────────
 
     /**
-     * Automatically determine the remarks integer based on employ_id and masterlist ACCSTATUS.
-     *
      * Pass a pre-fetched $accStatusMap (from getAccStatusByIds) to avoid a DB hit per call.
-     *
-     * Rules:
-     *   - blank/null      → Vacant (2)
-     *   - "Others"        → Temporary (4)
-     *   - ACCSTATUS = 2   → Inactive (3)
-     *   - ACCSTATUS = 1   → Active (1)  [default]
      */
     private function computeRemarks(?string $employId, array $accStatusMap = []): int
     {
         if (empty($employId)) {
-            return LockerCode::REMARK_VACANT;
+            return AdminLockerCode::REMARK_VACANT;
         }
 
         if (strtolower(trim($employId)) === 'others') {
-            return LockerCode::REMARK_TEMPORARY;
+            return AdminLockerCode::REMARK_TEMPORARY;
         }
 
         $accStatus = array_key_exists($employId, $accStatusMap)
             ? $accStatusMap[$employId]
             : $this->employees->getAccStatusById($employId);
 
-        return $accStatus === 2 ? LockerCode::REMARK_INACTIVE : LockerCode::REMARK_ACTIVE;
+        return $accStatus === 2 ? AdminLockerCode::REMARK_INACTIVE : AdminLockerCode::REMARK_ACTIVE;
     }
 
     private function ensureLockerNotTaken(string $lockerNo): void
