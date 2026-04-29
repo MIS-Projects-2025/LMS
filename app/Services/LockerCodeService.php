@@ -104,58 +104,61 @@ class LockerCodeService
      * Bulk upload rows from a CSV.
      * Returns ['created' => Collection, 'errors' => array]
      */
-    public function upload(array $rows): array
-    {
-        $toInsert = [];
-        $errors   = [];
-        $seen     = [];
+        public function upload(array $rows): array
+        {
+            $errors = [];
+            $seen   = [];
+            $counts = ['created' => 0, 'updated' => 0];
 
-        foreach ($rows as $index => $row) {
-            $rowNum    = $index + 1;
-            $lockerNo  = trim($row['locker_number'] ?? '');
-            $employId  = trim($row['emp_no'] ?? '');
-            $statusTxt = strtolower(trim($row['status'] ?? ''));
-            $status    = LockerCode::STATUS_MAP[$statusTxt] ?? LockerCode::REMARK_ACTIVE;
+            foreach ($rows as $index => $row) {
+                $rowNum    = $index + 1;
+                $lockerNo  = trim($row['locker_number'] ?? '');
+                $employId  = trim($row['emp_no'] ?? '');
+                $statusTxt = strtolower(trim($row['status'] ?? ''));
+                $status    = LockerCode::STATUS_MAP[$statusTxt] ?? LockerCode::REMARK_ACTIVE;
 
-            if (empty($lockerNo)) {
-                $errors[] = "Row {$rowNum}: Locker Number is required.";
-                continue;
+                if (empty($lockerNo)) {
+                    $errors[] = "Row {$rowNum}: Locker Number is required.";
+                    continue;
+                }
+
+                if ($employId && in_array($employId, $seen)) {
+                    $errors[] = "Row {$rowNum}: Employee No {$employId} is duplicated in the file.";
+                    continue;
+                }
+
+                // Find existing locker by locker_no
+                $existing = $this->repo->findByLockerNo($lockerNo);
+
+                // Only block if employee is assigned to a DIFFERENT locker
+                if ($employId && $this->repo->isEmployeeAssigned($employId, $existing?->id)) {
+                    $errors[] = "Row {$rowNum}: Employee No {$employId} is already assigned to another locker.";
+                    continue;
+                }
+
+                if ($employId) {
+                    $seen[] = $employId;
+                }
+
+                $data = [
+                    'employ_id'  => $employId ?: null,
+                    'passcode'   => trim($row['passcode'] ?? ''),
+                    'remarks'    => $status,
+                    'notes'      => trim($row['remarks'] ?? ''),
+                    'created_by' => $this->currentUser(),
+                ];
+
+                if ($existing) {
+                    $this->repo->update($existing->id, $data);
+                    $counts['updated']++;
+                } else {
+                    $this->repo->create(array_merge($data, ['locker_no' => $lockerNo]));
+                    $counts['created']++;
+                }
             }
 
-            if ($employId && in_array($employId, $seen)) {
-                $errors[] = "Row {$rowNum}: Employee No {$employId} is duplicated in the file.";
-                continue;
-            }
-
-            if ($employId && $this->repo->isEmployeeAssigned($employId)) {
-                $errors[] = "Row {$rowNum}: Employee No {$employId} is already assigned to a locker.";
-                continue;
-            }
-
-            $locker = $this->repo->findByLockerNo($lockerNo);
-
-            if ($locker && !$locker->isVacant()) {
-                $statusLabel = LockerCode::REMARK_LABELS[$locker->remarks] ?? $locker->remarks;
-                $errors[] = "Row {$rowNum}: Locker {$lockerNo} is not vacant (status: {$statusLabel}).";
-                continue;
-            }
-
-            $seen[] = $employId;
-
-            $toInsert[] = [
-                'locker_no'  => $lockerNo,
-                'employ_id'  => $employId ?: null,
-                'passcode'   => trim($row['passcode'] ?? ''),
-                'remarks'    => $status,
-                'notes'      => trim($row['remarks'] ?? ''),
-                'created_by' => $this->currentUser(),
-            ];
+            return ['counts' => $counts, 'errors' => $errors];
         }
-
-        $created = $this->repo->bulkCreate($toInsert);
-
-        return ['created' => $created, 'errors' => $errors];
-    }
 
     public function export(array $filters = []): Collection
     {
@@ -194,6 +197,7 @@ class LockerCodeService
 
     private function currentUser(): string
     {
-        return (string) (Auth::user()?->name ?? Auth::id() ?? 'system');
+        $empData = session('emp_data');
+        return (string) ($empData['emp_id'] ?? $empData['emp_name'] ?? 'system');
     }
 }

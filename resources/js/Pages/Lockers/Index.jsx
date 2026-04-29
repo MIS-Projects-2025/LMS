@@ -5,15 +5,15 @@ import { router, useForm, usePage } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/Components/ui/select";
 import {
     Table,
     TableBody,
@@ -21,31 +21,32 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/Components/ui/table";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Combobox } from "@/components/ui/combobox"; // Import your Combobox component
+} from "@/Components/ui/dialog";
+import { Label } from "@/Components/ui/label";
+import { Badge } from "@/Components/ui/badge";
+import { Combobox } from "@/Components/ui/combobox"; // Import your Combobox component
+import { ArrowRightLeft, Pencil, Trash2 } from "lucide-react";
 
-const REMARK_ACTIVE   = 1;
-const REMARK_VACANT   = 2;
+const REMARK_ACTIVE = 1;
+const REMARK_VACANT = 2;
 const REMARK_INACTIVE = 3;
 
 const REMARK_LABELS = {
-    [REMARK_ACTIVE]:   "Active",
-    [REMARK_VACANT]:   "Vacant",
+    [REMARK_ACTIVE]: "Active",
+    [REMARK_VACANT]: "Vacant",
     [REMARK_INACTIVE]: "Inactive",
 };
 
 const remarkVariant = {
-    [REMARK_ACTIVE]:   "default",
-    [REMARK_VACANT]:   "secondary",
+    [REMARK_ACTIVE]: "default",
+    [REMARK_VACANT]: "secondary",
     [REMARK_INACTIVE]: "destructive",
 };
 
@@ -259,12 +260,15 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && applyFilters()}
-                        className="w-60"
+                        className="w-60 w-full"
                     />
                     <Select
-                        value={filterRemark !== "" ? String(filterRemark) : "all"}
+                        value={
+                            filterRemark !== "" ? String(filterRemark) : "all"
+                        }
                         onValueChange={(value) => {
-                            const newValue = value === "all" ? "" : Number(value);
+                            const newValue =
+                                value === "all" ? "" : Number(value);
                             setFilterRemark(newValue);
                             applyFilters({ remarks: newValue || "" });
                         }}
@@ -275,7 +279,10 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                         <SelectContent>
                             <SelectItem value="all">All Status</SelectItem>
                             {remarkOptions.map((r) => (
-                                <SelectItem key={r.value} value={String(r.value)}>
+                                <SelectItem
+                                    key={r.value}
+                                    value={String(r.value)}
+                                >
                                     {r.label}
                                 </SelectItem>
                             ))}
@@ -285,7 +292,37 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                         Search
                     </Button>
 
-                    <div className="ml-auto flex gap-2">
+                    {/* ── Per-page selector — top right ── */}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground ml-auto">
+                        <span className="whitespace-nowrap">Rows per page</span>
+                        <Select
+                            value={String(filters.per_page ?? 15)}
+                            onValueChange={(value) =>
+                                router.get(
+                                    route("lockers.index"),
+                                    {
+                                        ...filters,
+                                        per_page: Number(value),
+                                        page: 1,
+                                    },
+                                    { preserveScroll: true, replace: true },
+                                )
+                            }
+                        >
+                            <SelectTrigger className="w-20 h-8">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[10, 15, 25, 50, 100].map((n) => (
+                                    <SelectItem key={n} value={String(n)}>
+                                        {n}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="flex gap-2">
                         <Button onClick={() => setShowCreate(true)}>
                             + Add Locker
                         </Button>
@@ -359,7 +396,8 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                                 "secondary"
                                             }
                                         >
-                                            {REMARK_LABELS[row.remarks] || row.remarks}
+                                            {REMARK_LABELS[row.remarks] ||
+                                                row.remarks}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-muted-foreground">
@@ -373,7 +411,7 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                                 onClick={() => openEdit(row)}
                                                 className="text-blue-600 h-auto p-0"
                                             >
-                                                Edit
+                                                <Pencil className="w-4 h-4" />
                                             </Button>
                                             <Button
                                                 variant="link"
@@ -387,7 +425,7 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                                 }}
                                                 className="text-indigo-600 h-auto p-0"
                                             >
-                                                Transfer
+                                                <ArrowRightLeft className="w-4 h-4" />
                                             </Button>
                                             <Button
                                                 variant="link"
@@ -397,7 +435,7 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                                 }
                                                 className="text-red-500 h-auto p-0"
                                             >
-                                                Delete
+                                                <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
                                     </TableCell>
@@ -408,24 +446,32 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex gap-1 mt-4 justify-end">
-                    {lockers.links.map((link, i) => (
-                        <Button
-                            key={i}
-                            variant={link.active ? "default" : "outline"}
-                            size="sm"
-                            disabled={!link.url}
-                            onClick={() =>
-                                link.url &&
-                                router.get(
-                                    link.url,
-                                    {},
-                                    { preserveScroll: true },
-                                )
-                            }
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
+                <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
+                    <p className="text-sm text-muted-foreground">
+                        {lockers.total === 0
+                            ? "No records found."
+                            : `Showing ${lockers.from}–${lockers.to} of ${lockers.total} records`}
+                    </p>
+
+                    <div className="flex gap-1">
+                        {lockers.links.map((link, i) => (
+                            <Button
+                                key={i}
+                                variant={link.active ? "default" : "outline"}
+                                size="sm"
+                                disabled={!link.url}
+                                onClick={() =>
+                                    link.url &&
+                                    router.get(
+                                        link.url,
+                                        {},
+                                        { preserveScroll: true },
+                                    )
+                                }
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 {/* ── Modals ── */}
@@ -506,7 +552,10 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {remarkOptions.map((r) => (
-                                            <SelectItem key={r.value} value={String(r.value)}>
+                                            <SelectItem
+                                                key={r.value}
+                                                value={String(r.value)}
+                                            >
                                                 {r.label}
                                             </SelectItem>
                                         ))}
@@ -610,7 +659,10 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {remarkOptions.map((r) => (
-                                            <SelectItem key={r.value} value={String(r.value)}>
+                                            <SelectItem
+                                                key={r.value}
+                                                value={String(r.value)}
+                                            >
                                                 {r.label}
                                             </SelectItem>
                                         ))}
@@ -641,7 +693,10 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                 {/* Transfer Dialog */}
                 <Dialog
                     open={!!transferRow}
-                    onOpenChange={() => { setTransferRow(null); transferForm.reset(); }}
+                    onOpenChange={() => {
+                        setTransferRow(null);
+                        transferForm.reset();
+                    }}
                 >
                     <DialogContent>
                         <DialogHeader>
@@ -708,7 +763,8 @@ export default function LockersIndex({ lockers, filters, remarkOptions }) {
                                 Locker Number, Emp No, Passcode, Status, Remarks
                             </code>
                             <br />
-                            Status accepts: <code className="text-xs">Active</code>,{" "}
+                            Status accepts:{" "}
+                            <code className="text-xs">Active</code>,{" "}
                             <code className="text-xs">Vacant</code>,{" "}
                             <code className="text-xs">Inactive</code>
                         </p>

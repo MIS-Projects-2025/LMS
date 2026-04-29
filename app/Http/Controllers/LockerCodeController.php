@@ -23,13 +23,17 @@ class LockerCodeController extends Controller
     public function index(Request $request): InertiaResponse
     {
         $filters = $request->only(['search', 'remarks', 'sort_by', 'sort_dir']);
+        $perPage = (int) $request->get('per_page', 10);
+
+        $lockers = $this->service->list($filters, $perPage);
 
         return Inertia::render('Lockers/Index', [
-            'lockers'       => $this->service->list($filters),
-            'filters'       => $filters,
+            'lockers'       => $lockers,
+            'filters'       => array_merge($filters, ['per_page' => $perPage]),
             'remarkOptions' => collect(LockerCode::REMARK_LABELS)
                 ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
                 ->values(),
+                'upload_result' => session('upload_result'),
         ]);
     }
     public function store(Request $request): RedirectResponse
@@ -94,10 +98,12 @@ class LockerCodeController extends Controller
         $rows   = $this->parseExcel($request->file('file'));
         $result = $this->service->upload($rows);
 
-        return back()->with('upload_result', [
-            'success_count' => $result['created']->count(),
-            'errors'        => $result['errors'],
-        ]);
+       return redirect()->route('lockers.index')->with('upload_result', [
+        'success_count' => $result['counts']['created'] + $result['counts']['updated'],
+        'created_count' => $result['counts']['created'],
+        'updated_count' => $result['counts']['updated'],
+        'errors'        => $result['errors'],
+    ]);
     }
 
     public function export(Request $request): StreamedResponse
@@ -162,7 +168,7 @@ class LockerCodeController extends Controller
 
             $cells = [];
             foreach ($cellIterator as $cell) {
-                $cells[] = trim((string) ($cell->getValue() ?? ''));
+                 $cells[] = trim((string) ($cell->getCalculatedValue() ?? ''));
             }
 
             if (!$headers) {

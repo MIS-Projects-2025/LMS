@@ -15,6 +15,8 @@ require __DIR__ . '/general.php';
 //Locker routes
 require __DIR__ . '/lockers.php';
 
+//admin
+require __DIR__ . '/admin.php';
 Route::get("/demo", [DemoController::class, 'index'])->name('demo');
 
 Route::fallback(function () {

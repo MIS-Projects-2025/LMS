@@ -54,6 +54,22 @@ class AuthMiddleware
                 return redirect($url)->withCookie($cookie);
             }
 
+            // 🔹 Check if user is in locker users list
+            $isLockerUser = DB::table('locker_users')
+                ->where('employid', session('emp_data.emp_id'))
+                ->exists();
+
+            if (!$isLockerUser) {
+                session()->forget('emp_data');
+                session()->flush();
+                $authifyUrl = "http://192.168.2.221:8200/logout?redirect=" . urlencode(route('dashboard'));
+
+                return Inertia::render('Unauthorized', [
+                    'logoutUrl' => $authifyUrl,
+                    'message'   => 'Access Restricted: You are not authorized to access this application.',
+                ])->toResponse($request)->setStatusCode(403);
+            }
+
             // 🔹 Check maintenance mode — skip for logout & system-status routes
             if (!$this->isBypassRoute($request)) {
                 $maintenanceResponse = $this->checkMaintenance($request);
@@ -73,7 +89,6 @@ class AuthMiddleware
 
         if (!$currentUser) {
             session()->forget('emp_data');
-            // Clear this system's own cookie only
             $expiredCookie = cookie()->forget($cookieName);
             Cookie::queue(Cookie::forget('sso_token'));
             return $this->redirectToLogin($request);
@@ -115,6 +130,23 @@ class AuthMiddleware
         session()->save();
 
         $request->setUserResolver(fn() => (object) session('emp_data'));
+
+        // 🔹 Check if user is in locker users list
+        $isLockerUser = DB::table('locker_users')
+            ->where('employid', $currentUser->emp_id)
+            ->exists();
+
+        if (!$isLockerUser) {
+            session()->forget('emp_data');
+            session()->flush();
+            $redirectUrl = urlencode(route('dashboard'));
+            $authifyUrl  = "http://192.168.2.221:8200/logout?redirect={$redirectUrl}";
+
+            return Inertia::render('Unauthorized', [
+                'logoutUrl' => $authifyUrl,
+                'message'   => 'Access Restricted: You are not authorized to access this application.',
+            ])->toResponse($request)->setStatusCode(403);
+        }
 
         $cookie = cookie($cookieName, $currentUser->token, 60 * 24 * 7);
 

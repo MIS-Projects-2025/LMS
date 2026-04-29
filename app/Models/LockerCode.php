@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\Loggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 class LockerCode extends Model
 {
+    use Loggable;
     protected $table = 'locker_codes';
 
     protected $fillable = [

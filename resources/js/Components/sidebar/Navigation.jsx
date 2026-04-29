@@ -1,6 +1,6 @@
 import { usePage } from "@inertiajs/react";
 import SidebarLink from "@/Components/sidebar/SidebarLink";
-import { LayoutDashboard, LockIcon } from "lucide-react";
+import { LayoutDashboard, LockIcon, User } from "lucide-react";
 
 export default function NavLinks({ isSidebarOpen }) {
     const { emp_data } = usePage().props;
@@ -11,9 +11,9 @@ export default function NavLinks({ isSidebarOpen }) {
             style={{ scrollbarWidth: "none" }}
         >
             <SidebarLink
-                href={route("dashboard")}
-                label="Dashboard"
-                icon={<LayoutDashboard className="w-5 h-5" />}
+                href={route("lockerUsers.form")}
+                label="Users"
+                icon={<User className="w-5 h-5" />}
                 isSidebarOpen={isSidebarOpen}
             />
             <SidebarLink
