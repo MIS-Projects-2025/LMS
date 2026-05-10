@@ -49,7 +49,8 @@ export default function UploadDialog({
                     <p className="text-muted-foreground">
                         <code className="rounded bg-muted px-1 py-0.5 text-xs">Locker Number</code>{" "}
                         <code className="rounded bg-muted px-1 py-0.5 text-xs">Emp No</code>{" "}
-                        <code className="rounded bg-muted px-1 py-0.5 text-xs">Passcode</code>
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">Passcode</code>{" "}
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">Notes</code>
                     </p>
                     <p className="text-muted-foreground text-xs">
                         Status is auto-generated from the employee masterlist.{" "}

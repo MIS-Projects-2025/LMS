@@ -33,7 +33,7 @@ export default function LockerFormDialog({
     updateRoute,
 }) {
     const isEdit = !!row;
-    const form = useForm({ locker_no: "", employ_id: "", passcode: "" });
+    const form = useForm({ locker_no: "", employ_id: "", passcode: "", notes: "" });
 
     // Populate / reset form whenever the dialog opens or the target row changes
     useEffect(() => {
@@ -42,6 +42,7 @@ export default function LockerFormDialog({
                 locker_no: row?.locker_no ?? "",
                 employ_id: row?.employ_id ?? "",
                 passcode:  row?.passcode  ?? "",
+                notes:     row?.notes     ?? "",
             });
         } else {
             form.reset();
@@ -111,6 +112,17 @@ export default function LockerFormDialog({
                             value={form.data.passcode}
                             onChange={(e) => form.setData("passcode", e.target.value)}
                         />
+                    </div>
+
+                    <div className="space-y-1">
+                        <Label>Notes</Label>
+                        <Input
+                            value={form.data.notes}
+                            onChange={(e) => form.setData("notes", e.target.value)}
+                        />
+                        {form.errors.notes && (
+                            <p className="text-xs text-destructive">{form.errors.notes}</p>
+                        )}
                     </div>
 
                     <DialogFooter>

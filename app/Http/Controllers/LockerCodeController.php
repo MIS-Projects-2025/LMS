@@ -41,6 +41,7 @@ class LockerCodeController extends Controller
             'locker_no' => ['required', 'string', 'max:100'],
             'employ_id' => ['nullable', 'string', 'max:50'],
             'passcode'  => ['nullable', 'string', 'max:50'],
+            'notes'     => ['nullable', 'string', 'max:255'],
         ]);
 
         $this->service->create($data);
@@ -54,6 +55,7 @@ class LockerCodeController extends Controller
             'locker_no' => ['sometimes', 'string', 'max:100'],
             'employ_id' => ['nullable', 'string', 'max:50'],
             'passcode'  => ['nullable', 'string', 'max:50'],
+            'notes'     => ['nullable', 'string', 'max:255'],
         ]);
 
         $this->service->edit($id, $data);
@@ -142,7 +144,7 @@ class LockerCodeController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
 
-        $sheet->fromArray(['Locker Number', 'Emp No', 'Passcode'], null, 'A1');
+        $sheet->fromArray(['Locker Number', 'Emp No', 'Passcode', 'Notes'], null, 'A1');
 
         $writer   = new Xlsx($spreadsheet);
 

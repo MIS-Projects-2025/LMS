@@ -135,19 +135,21 @@ class LockerCodeService
                 continue;
             }
 
-            // Duplicate employee within the uploaded file
-            if ($employId && in_array($employId, $seen)) {
+            $isOthers = strtolower($employId) === 'others';
+
+            // Duplicate employee within the uploaded file (skip for "others")
+            if ($employId && !$isOthers && in_array($employId, $seen)) {
                 $errors[] = "Row {$rowNum}: Employee No {$employId} is duplicated in the file.";
                 continue;
             }
 
-            // Employee already has a locker anywhere in the DB — block unconditionally
-            if ($employId && $this->repo->isEmployeeAssigned($employId)) {
+            // Employee already has a locker anywhere in the DB — block unconditionally (skip for "others")
+            if ($employId && !$isOthers && $this->repo->isEmployeeAssigned($employId)) {
                 $errors[] = "Row {$rowNum}: Employee No {$employId}: Locker for this employee already exists. Please check and modify the current locker first.";
                 continue;
             }
 
-            if ($employId) {
+            if ($employId && !$isOthers) {
                 $seen[] = $employId;
             }
 
@@ -157,7 +159,7 @@ class LockerCodeService
                 'employ_id'  => $employId ?: null,
                 'passcode'   => trim($row['passcode'] ?? ''),
                 'remarks'    => $this->computeRemarks($employId ?: null, $accStatusMap),
-                'notes'      => trim($row['remarks'] ?? ''),
+                'notes'      => trim($row['notes'] ?? ''),
                 'created_by' => $this->currentUser(),
             ];
 
