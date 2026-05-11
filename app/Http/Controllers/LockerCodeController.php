@@ -106,7 +106,7 @@ class LockerCodeController extends Controller
         $sheet       = $spreadsheet->getActiveSheet();
 
         $sheet->fromArray(
-            ['Locker Number', 'Emp No', 'Passcode', 'Status', 'Remarks'],
+            ['Locker Number', 'Emp No', 'Passcode', 'Status', 'Notes'],
             null,
             'A1'
         );
