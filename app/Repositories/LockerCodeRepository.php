@@ -98,6 +98,14 @@ class LockerCodeRepository
         return (bool) $this->model->findOrFail($id)->delete();
     }
 
+    public function countByRemarks(): array
+    {
+        return $this->model->selectRaw('remarks, count(*) as total')
+            ->groupBy('remarks')
+            ->pluck('total', 'remarks')
+            ->toArray();
+    }
+
     public function bulkCreate(array $rows): Collection
     {
         $created = collect();

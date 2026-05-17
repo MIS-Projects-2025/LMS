@@ -59,6 +59,7 @@ export default function LockerPageLayout({
     lockers,
     filters,
     remarkOptions,
+    statusCounts = {},
     config,
 }) {
     const { props } = usePage();
@@ -269,6 +270,24 @@ export default function LockerPageLayout({
                     </TooltipProvider>
                 </div>
 
+                {/* ── Status count pills ── */}
+                {remarkOptions.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                        {remarkOptions.map((r) => (
+                            <Badge
+                                key={r.value}
+                                variant={REMARK_VARIANTS[r.value] ?? "secondary"}
+                                className="px-3 py-1 text-sm gap-1.5"
+                            >
+                                {r.label}
+                                <span className="font-bold">
+                                    {statusCounts[r.value] ?? 0}
+                                </span>
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+
                 {/* ── Table area (fullscreen target) ── */}
                 <div
                     ref={tableAreaRef}
@@ -384,6 +403,7 @@ export default function LockerPageLayout({
                                     <TableHead>Employee Name</TableHead>
                                     <TableHead>Passcode</TableHead>
                                     <TableHead>Status</TableHead>
+                                    <TableHead>Notes</TableHead>
                                     <TableHead>Created By</TableHead>
                                     <TableHead className="w-[120px]">
                                         Actions
@@ -394,7 +414,7 @@ export default function LockerPageLayout({
                                 {lockers.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={7}
+                                            colSpan={8}
                                             className="h-24 text-center text-muted-foreground"
                                         >
                                             No records found.
@@ -439,6 +459,13 @@ export default function LockerPageLayout({
                                                         row.remarks
                                                     ] ?? row.remarks}
                                                 </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-sm max-w-[180px] truncate" title={row.notes ?? ""}>
+                                                {row.notes ?? (
+                                                    <span className="text-muted-foreground">
+                                                        —
+                                                    </span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground text-sm">
                                                 {row.created_by}

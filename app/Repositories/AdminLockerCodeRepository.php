@@ -93,6 +93,14 @@ class AdminLockerCodeRepository
         return $record->fresh();
     }
 
+    public function countByRemarks(): array
+    {
+        return $this->model->selectRaw('remarks, count(*) as total')
+            ->groupBy('remarks')
+            ->pluck('total', 'remarks')
+            ->toArray();
+    }
+
     public function delete(int $id): bool
     {
         return (bool) $this->model->findOrFail($id)->delete();

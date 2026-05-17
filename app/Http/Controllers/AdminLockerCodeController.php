@@ -31,6 +31,7 @@ class AdminLockerCodeController extends Controller
             'remarkOptions' => collect(AdminLockerCode::REMARK_LABELS)
                 ->map(fn($label, $value) => ['value' => $value, 'label' => $label])
                 ->values(),
+            'statusCounts'  => $this->service->countByRemarks(),
             'upload_result' => session('upload_result'),
         ]);
     }

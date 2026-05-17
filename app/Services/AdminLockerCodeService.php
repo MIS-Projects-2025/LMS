@@ -175,6 +175,11 @@ class AdminLockerCodeService
         return $this->repo->exportAll($filters);
     }
 
+    public function countByRemarks(): array
+    {
+        return $this->repo->countByRemarks();
+    }
+
     public function vacantLockers(): Collection
     {
         return $this->repo->vacantLockers();
