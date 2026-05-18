@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+.env
+.env.*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*
+.git
+.gitignore
+README.md
+docker-compose.yml
+Dockerfile
+.dockerignore

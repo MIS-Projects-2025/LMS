@@ -1,0 +1,31 @@
+services:
+    # Soketi container
+    soketi-lms:
+        image: quay.io/soketi/soketi:latest
+        container_name: soketi_lms
+        ports:
+            - "6004:6004"
+            - "9604:9604"
+        environment:
+            DEBUG: "soketi:*"
+            SOKETI_HOST: "0.0.0.0"
+            SOKETI_PORT: 6004
+            SOKETI_DEFAULT_APP_ID: "3004"
+            SOKETI_DEFAULT_APP_KEY: "9c7a5e2f1b3d4a6c8e0f2d1c3b5a7e9f"
+            SOKETI_DEFAULT_APP_SECRET: "7f3c9d2a6b1e4f8c0a5d3e7b9c2f1a6d4e8c0b2f9a7d6c3e1f5b8a0d2c4e6f1"
+            SOKETI_METRICS_SERVER_PORT: 9604
+        restart: unless-stopped
+
+    # Laravel scheduler container
+    scheduler:
+        build: .
+        container_name: laravel_scheduler_lms
+        working_dir: /var/www
+        volumes:
+            - .:/var/www
+        env_file:
+            - .env.docker
+        restart: unless-stopped
+        depends_on:
+            - soketi-lms
+        command: php artisan schedule:work

@@ -1,0 +1,81 @@
+--2026-05-04 09:07:30--  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Resolving ppa.launchpadcontent.net (ppa.launchpadcontent.net)... 185.125.190.80
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:09:47--  (try: 2)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:12:03--  (try: 3)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:14:21--  (try: 4)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:16:39--  (try: 5)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:18:59--  (try: 6)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:21:20--  (try: 7)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:23:40--  (try: 8)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:26:02--  (try: 9)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:28:24--  (try:10)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:30:49--  (try:11)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:33:12--  (try:12)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:35:35--  (try:13)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:37:59--  (try:14)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:40:22--  (try:15)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:42:46--  (try:16)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:45:09--  (try:17)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:47:32--  (try:18)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:49:56--  (try:19)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Retrying.
+
+--2026-05-04 09:52:19--  (try:20)  https://ppa.launchpadcontent.net/ondrej/php/ubuntu/pool/main/p/php8.2/php8.2-mysql_8.2.30-3+ubuntu24.04.1+deb.sury.org+1_amd64.deb
+Connecting to ppa.launchpadcontent.net (ppa.launchpadcontent.net)|185.125.190.80|:443... failed: Connection timed out.
+Giving up.
+
