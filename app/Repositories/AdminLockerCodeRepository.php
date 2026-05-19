@@ -34,7 +34,12 @@ class AdminLockerCodeRepository
 
         $sortBy  = $filters['sort_by']  ?? 'locker_no';
         $sortDir = $filters['sort_dir'] ?? 'asc';
-        $query->orderBy($sortBy, $sortDir);
+
+        if ($sortBy === 'locker_no') {
+            $query->orderByRaw("CAST(locker_no AS UNSIGNED) {$sortDir}, locker_no {$sortDir}");
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
 
         return $query->paginate($perPage)->withQueryString();
     }
@@ -60,14 +65,14 @@ class AdminLockerCodeRepository
 
     public function vacantLockers(): Collection
     {
-        return $this->model->vacant()->orderBy('locker_no')->get();
+        return $this->model->vacant()->orderByRaw('CAST(locker_no AS UNSIGNED), locker_no')->get();
     }
 
     public function availableLockers(string $search = ''): Collection
     {
         $query = $this->model->newQuery()
             ->whereIn('remarks', [AdminLockerCode::REMARK_VACANT, AdminLockerCode::REMARK_INACTIVE])
-            ->orderBy('locker_no');
+            ->orderByRaw('CAST(locker_no AS UNSIGNED), locker_no');
 
         if ($search !== '') {
             $query->where('locker_no', 'like', "%{$search}%");
@@ -84,7 +89,7 @@ class AdminLockerCodeRepository
             $query->where('remarks', $filters['remarks']);
         }
 
-        return $query->orderBy('locker_no')->get();
+        return $query->orderByRaw('CAST(locker_no AS UNSIGNED), locker_no')->get();
     }
 
     public function create(array $data): AdminLockerCode

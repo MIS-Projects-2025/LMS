@@ -80,9 +80,14 @@ export default function LockerPageLayout({
     // ── fullscreen ────────────────────────────────────────────────────────────
     const tableAreaRef = useRef(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [portalContainer, setPortalContainer] = useState(null);
 
     useEffect(() => {
-        const handler = () => setIsFullscreen(!!document.fullscreenElement);
+        const handler = () => {
+            const fs = !!document.fullscreenElement;
+            setIsFullscreen(fs);
+            setPortalContainer(fs ? tableAreaRef.current : null);
+        };
         document.addEventListener("fullscreenchange", handler);
         return () => document.removeEventListener("fullscreenchange", handler);
     }, []);
@@ -237,7 +242,7 @@ export default function LockerPageLayout({
                                     <TooltipContent>
                                         Export Excel
                                     </TooltipContent>
-                                    <DropdownMenuContent align="end">
+                                    <DropdownMenuContent align="end" container={portalContainer}>
                                         <DropdownMenuLabel>
                                             Export by Status
                                         </DropdownMenuLabel>
@@ -323,7 +328,7 @@ export default function LockerPageLayout({
                             <SelectTrigger className="w-40">
                                 <SelectValue placeholder="All Status" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent container={portalContainer}>
                                 <SelectItem value="all">All Status</SelectItem>
                                 {remarkOptions.map((r) => (
                                     <SelectItem
@@ -364,7 +369,7 @@ export default function LockerPageLayout({
                                 <SelectTrigger className="w-20 h-8">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent container={portalContainer}>
                                     {[10, 15, 25, 50, 100].map((n) => (
                                         <SelectItem key={n} value={String(n)}>
                                             {n}
