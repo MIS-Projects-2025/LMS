@@ -14,11 +14,17 @@ class LockerCodeRepository
     {
         $query = $this->model->newQuery();
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('locker_no', 'like', "%{$search}%")
-                    ->orWhere('employ_id', 'like', "%{$search}%");
+        if (!empty($filters['search']) || !empty($filters['emp_ids'])) {
+            $search = $filters['search'] ?? '';
+            $empIds = $filters['emp_ids'] ?? [];
+            $query->where(function ($q) use ($search, $empIds) {
+                if ($search !== '') {
+                    $q->where('locker_no', 'like', "%{$search}%")
+                      ->orWhere('employ_id', 'like', "%{$search}%");
+                }
+                if (!empty($empIds)) {
+                    $q->orWhereIn('employ_id', $empIds);
+                }
             });
         }
 

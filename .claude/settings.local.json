@@ -3,7 +3,10 @@
     "allow": [
       "Bash(composer require:*)",
       "Bash(php artisan:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(xargs grep:*)",
+      "Bash(cat /c/Users/telford.programmer/Desktop/LMS/database/migrations/*)",
+      "Bash(find:*)"
     ]
   }
 }

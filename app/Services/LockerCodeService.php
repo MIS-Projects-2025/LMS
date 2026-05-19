@@ -19,6 +19,10 @@ class LockerCodeService
 
     public function list(array $filters, int $perPage = 15): LengthAwarePaginator
     {
+        if (!empty($filters['search'])) {
+            $filters['emp_ids'] = $this->employees->getIdsByNameSearch($filters['search']);
+        }
+
         $paginator = $this->repo->paginate($filters, $perPage);
 
         $ids   = collect($paginator->items())->pluck('employ_id')->filter()->unique()->values()->all();

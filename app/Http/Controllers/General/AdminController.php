@@ -27,7 +27,7 @@ class AdminController extends Controller
             'mysql',
             'admin',
             [
-                'searchColumns' => ['EMPNAME', 'EMPLOYID', 'JOB_TITLE', 'DEPARTMENT'],
+                'searchColumns' => ['emp_id', 'emp_name', 'emp_role'],
             ]
         );
 

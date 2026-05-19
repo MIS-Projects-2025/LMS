@@ -90,6 +90,19 @@ class EmployeeRepository
     }
 
     /**
+     * Get all EMPLOYIDs whose EMPNAME matches the search term.
+     * Used to support employee-name search on tables that only store employ_id.
+     */
+    public function getIdsByNameSearch(string $search): array
+    {
+        if (empty($search)) return [];
+
+        return Masterlist::where('EMPNAME', 'LIKE', "%{$search}%")
+            ->pluck('EMPLOYID')
+            ->toArray();
+    }
+
+    /**
      * Get initial employees for dropdown (first 50).
      */
     public function getInitialEmployees(): array
